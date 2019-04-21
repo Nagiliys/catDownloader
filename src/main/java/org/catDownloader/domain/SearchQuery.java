@@ -1,14 +1,13 @@
 package org.catDownloader.domain;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.util.Collection;
-import java.util.Properties;
 
+import org.catDownloader.api.domain.ISearchQuery;
 import org.catDownloader.dto.CatInfo;
+import org.catDownloader.util.properties.SearchProperties;
 
-public class SearchQuery{
+public class SearchQuery implements ISearchQuery{
+	
 	private static final String COMMA = ",";
 	private static final String AMPERSAND = "&";
 	private static final String QUESTION_MARK = "?";
@@ -20,10 +19,12 @@ public class SearchQuery{
 	private static final String MIME_TYPES = "mime_types=";
 	private static StringBuilder builder;
 	private static String searchUrl;
+	private static SearchProperties searchProperty;
 	
-	public static String CreateQuery(CatInfo catInfo){
-        try {
-        	searchUrl = getURL();
+	@Override
+	public String CreateQuery(CatInfo catInfo){
+        
+        searchUrl = getURL();
         
         builder = new StringBuilder(searchUrl);
         builder.append(QUESTION_MARK);
@@ -56,14 +57,11 @@ public class SearchQuery{
 			builder.append(ORDER);
 			builder.append(catInfo.getOrder());
 		}
-        } catch (Exception e)
-        {
-        	return "";
-        }
+        
 		return builder.toString();
 	}
 	
-	private static String collectionToString(Collection<?> collection) {
+	private String collectionToString(Collection<?> collection) {
 		StringBuilder builder = new StringBuilder();
 		int i = 0;
 		for (Object obj : collection) {
@@ -77,9 +75,9 @@ public class SearchQuery{
 		return builder.toString();
 	}
 	
-	private static String getURL() throws FileNotFoundException, IOException {
-		Properties property = new Properties();
-		property.load(new FileInputStream("src/main/properties/search_url.properties"));
-        return property.getProperty("searchUrl");
+	private String getURL() {
+		searchProperty = new SearchProperties("searchUrl");
+	    return searchProperty.getSearchUrl();
+		
 	}
 }
